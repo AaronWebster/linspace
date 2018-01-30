@@ -1,4 +1,4 @@
-% linspace, a GNU bc command line based version of the matlab/octave linspace
+# `linspace`, a GNU bc command line based version of the MATLAB/Octave LINSPACE
 
 `linspace` prints linearly spaced values of numbers to the console:
 
