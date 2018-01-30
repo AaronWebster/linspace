@@ -1,0 +1,53 @@
+#!/bin/bash
+
+# Check for the proper number of command line arguments.
+if [ "$#" -lt 3 ]
+then
+	echo "usage: linspace <min> <max> <samples> [precision]"
+	exit
+fi
+
+# Use default precision if unspecified.
+PRINTDIG=20
+PREC=$PRINTDIG*2
+
+if [ $4 ] 
+then
+	PRINTDIG=$4
+	PREC=$4*2
+fi
+
+# Use bc to interpolate.
+cat << EOF | bc -lq
+#!/usr/bin/bc -lq 
+
+define r (a,s) {
+auto z,f,n 
+
+n = 0;
+z=scale;
+scale=s+1;
+
+if (a < 0) { n = 1; a = -(a) }
+f=a + (5 / 10^(s + 1));
+scale=s;
+f=(f * (10^s)) / (10^s);
+if (n > 0) f = -(f);
+scale=z;
+return(f)
+}
+
+
+scale=$PREC
+lb=$1;
+ub=$2;
+n=$3;
+
+if(n==1){ dn=(ub-lb)/n; }
+if(n!=1){ dn=(ub-lb)/(n-1); }
+
+for(i=0;i<n;i++){
+	r(lb+dn*i,$PRINTDIG)
+}
+quit
+EOF
